@@ -285,20 +285,8 @@ def playerStandings(tournament=MAIN_TOURNAMENT):
 
     tid = getTournamentId(tournament)
 
-    # Note: I couldn't move this to a VIEW as I couldn't find a way to pass
-    #       parameter to a VIEW since I have to pass the tournament id
-    #       as seen in this query.
-    query = "SELECT p.id, p.name, COALESCE(pwins.wins,0) AS wins, " +\
-            "COALESCE(plosses.losses, 0) AS losses FROM Players AS p " +\
-            "RIGHT JOIN (SELECT pid, tid FROM PlayersTournaments " +\
-            "WHERE tid = %s) " +\
-            "AS pt ON p.id = pt.pid " +\
-            "LEFT JOIN (SELECT * FROM PlayerWins WHERE tid = %s) " +\
-            "AS pwins ON p.id = pwins.pid " +\
-            "LEFT JOIN (SELECT * FROM PlayerLosses WHERE tid = %s) " +\
-            "AS plosses ON p.id = plosses.pid " +\
-            "ORDER BY wins DESC, id ASC"
-    parameter = ((tid,), (tid,), (tid,))
+    query = "SELECT * FROM PlayerStandings(%s)"
+    parameter = (tid,)
     cursor.execute(query, parameter)
 
     rows = cursor.fetchall()
@@ -332,10 +320,16 @@ def matchExists(winner, loser, tournament=MAIN_TOURNAMENT):
 
     db, cursor = connect()
 
-    query = "SELECT count(*) FROM Matches WHERE " +\
-            "tid = %s AND ((winner=%s and loser=%s) " +\
-            "OR (winner=%s and loser=%s))"
-    parameter = ((tid,), (winner,), (loser,), (loser,), (winner,))
+    # "Bye" situation: winner is same as loser
+    if (winner == loser):
+        query = "SELECT count(*) FROM Matches WHERE " +\
+                "tid = %s AND (winner=%s and loser=%s)"
+        parameter = ((tid,), (winner,), (loser,))
+    else:
+        query = "SELECT count(*) FROM Matches WHERE " +\
+                "tid = %s AND ((winner=%s and loser=%s) " +\
+                "OR (winner=%s and loser=%s))"
+        parameter = ((tid,), (winner,), (loser,), (loser,), (winner,))
     cursor.execute(query, parameter)
     count = cursor.fetchone()[0]
 
@@ -354,6 +348,7 @@ def reportMatch(winner, loser, tournament=MAIN_TOURNAMENT):
     """
 
     result = True
+
     # Make sure 2 players haven't played yet.
     if (matchExists(winner, loser) == False):
         tid = getTournamentId(tournament)
@@ -382,8 +377,7 @@ def givePlayerBye(player, tournament=MAIN_TOURNAMENT):
       player:  the id number of the player who got bye and automatic win.
       tournament: name of the tournament where the player is participating.
     """
-    # print "player {player} gets a bye!".format(player=player)
-    reportMatch(player, 0, tournament)
+    reportMatch(player, player, tournament)
 
 
 def swissPairings(tournament=MAIN_TOURNAMENT):
