@@ -1,9 +1,3 @@
--- Drop tables
-DROP TABLE PlayersTournaments CASCADE;
-DROP TABLE Tournaments CASCADE;
-DROP TABLE Players CASCADE;
-DROP TABLE Matches CASCADE;
-
 -- Drop database
 \c template1;
 DROP DATABASE tournament;
@@ -24,15 +18,6 @@ CREATE TABLE Players(
 
 \d Players;
 
--- Create "Matches" table
-CREATE TABLE Matches(
-	id SERIAL primary key, 
-	winner INT not null DEFAULT 0,
-	loser INT DEFAULT 0,
-	tid int not null);
-
-\d Matches;
-
 -- Create "Tournaments" table
 CREATE TABLE Tournaments(
 	id SERIAL primary key, 
@@ -41,14 +26,24 @@ CREATE TABLE Tournaments(
 -- Insert "Main" Tournament
 INSERT INTO Tournaments (name) VALUES('MAIN_TOURNAMENT');
 
-
 \d Tournaments;
+
+-- Create "Matches" table
+CREATE TABLE Matches(
+	id SERIAL primary key, 
+	winner INT references players(id),
+	-- NOTE: I couldn't get the foreign key to work here because I insert "0" in the loser's column
+	-- 		  when the Player(winner) has a "Bye" in the case of odd number of registered users.
+	loser INT not null,
+	tid INT references tournaments(id));
+
+\d Matches;
 
 -- Create "PlayersTournaments" table
 CREATE TABLE PlayersTournaments(
 	id SERIAL primary key,
-	pid int references players(id), 
-	tid int references tournaments(id));
+	pid INT references players(id), 
+	tid INT references tournaments(id));
 
 \d PlayersTournaments;
 

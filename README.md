@@ -1,4 +1,4 @@
-Tournament DB 
+Swiss Tournament DB  version 1.0 9/18/2016
 =============
 It is a project where we use Postgre DB to simulate the Swiss Tournament.
 Based from the number of players registered, this program can give you the
@@ -13,28 +13,22 @@ the tournament and its an automatic win.
 
 How To Use?
 =============
-- To run the test
-	-  do: python tournament_test.py
-- To register player:
-	- to the main tournament
-		- registerPlayer("A")
-	- to a different tournament
-		- registerPlayer("A", "Tournament1")
-- To check player standings:
-	- of main tournament
-		-  playerStandings()
-	- of different tournament
-		-  playerStandings("Tournament1")
-- To get swiss pairings for the next round:
-	- from main tournament
-		-  swissPairings()
-	- from different tournament
-		-  swissPairings("Tournament1")
-- To match players:
-	- in main tournament
-		-  reportMatch(winner id, loser id)
-	- in different tournament
-		-  reportMatch(winner id, loser id, "Tournament1")				
+To run the application, navigate to ***tournament*** folder and create a database schema by typing:
+> psql - f tournament.sql
+
+Then, you can execute the tests module by typing:
+> python tournament_test.py
+
+Below are  the methods you can use from the ***tournament*** module:
+
+Description | Usage
+------------ | -------------
+Register a player | registerPlayer(player name, ***[tournament name]***)  |  
+Check player standings | playerStandings(***[tournament name]***) 
+Get swiss pairings for the next round | swissPairings(***[tournament name]***) 
+Match players | reportMatch(winner id, loser id, ***[tournament name]***) 		
+
+**Note:** If a ***tournament name*** is not provided, it will default to the main tournament.
 
 Supported features
 ==============
