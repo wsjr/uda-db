@@ -1,4 +1,4 @@
-**Swiss Tournament DB**   *version 1.0 9/18/2016*
+Swiss Tournament DB
 =============
 It is a project where we use Postgre DB to simulate the Swiss Tournament.
 Based from the number of players registered, this program can give you the
